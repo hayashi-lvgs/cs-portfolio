@@ -3,7 +3,8 @@
     "allow": [
       "Bash(python3:*)",
       "Bash(cp:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(claude-monitor:*)"
     ]
   }
 }
