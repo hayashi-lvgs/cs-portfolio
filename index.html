@@ -484,8 +484,22 @@
 
       /* prevent misc overflow */
       .note, .compare, .flow, .codeblock { max-width: 100%; }
-      .hero-title { word-break: keep-all; }
       img { max-width: 100%; height: auto; }
+
+      /* text wrapping */
+      body { overflow-wrap: break-word; word-break: break-word; }
+      .hero-title { font-size: clamp(32px, 9vw, 48px); }
+      .codeblock pre { white-space: pre-wrap; word-break: break-all; }
+
+      /* grid/flex children must be allowed to shrink */
+      .tl-item > div,
+      .lb-header > div,
+      .lb-body > div,
+      .learn-item,
+      .s-col { min-width: 0; }
+
+      /* inline code in notes */
+      code { word-break: break-all; }
     }
   </style>
 </head>
