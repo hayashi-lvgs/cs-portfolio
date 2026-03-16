@@ -298,7 +298,10 @@
     .flow-step-sub { font-size: 12px; color: var(--fg-muted); }
 
     /* ── SUMMARY ── */
-    .summary-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .summary-cols {
+      display: grid; grid-template-columns: 1fr 1fr;
+      max-width: 860px; margin: 0 auto;
+    }
 
     .s-col { padding: 36px 0; padding-right: 44px; }
 
@@ -777,23 +780,22 @@
 
   <div class="summary-cols reveal">
     <div class="s-col">
-      <p class="s-col-label">得られた学び</p>
+      <p class="s-col-label">学んだこと</p>
       <ul class="s-list">
-        <li>Figma → React → Storybook のワークフローを実践で習得</li>
-        <li>Vite の仕組みと HMR・npm スクリプトの運用を体得</li>
-        <li>Git / GitHub のバージョン管理フローをマスター</li>
-        <li>TypeScript による型安全なコーディングの基礎を習得</li>
-        <li>エラーログから原因を特定するトラブルシューティング力</li>
+        <li>HTML / CSS / JavaScript の基本的な書き方と、ブラウザがページを表示する仕組みを理解した</li>
+        <li>Git でファイルの変更を記録し、GitHub でリモートに保存・共有する手順を身につけた</li>
+        <li>React + Vite でプロジェクトを立ち上げ、コンポーネントという単位でUIを作る考え方を理解した</li>
+        <li>TypeScript で props に型を定義し、デザイン仕様をそのままコードで表現できることを体験した</li>
+        <li>エラーメッセージを読んで原因を調べ、自分で解決する経験を繰り返した</li>
       </ul>
     </div>
     <div class="s-col">
-      <p class="s-col-label">達成した成果</p>
+      <p class="s-col-label">できたこと</p>
       <ul class="s-list">
-        <li>UIカタログ環境（Storybook）の構築</li>
-        <li>hover / disabled など多状態を管理する Button コンポーネント完成</li>
-        <li>GitHub Pages でのサイト公開</li>
-        <li>Figma の仕様を Storybook に直接埋め込む連携フロー確立</li>
-        <li>中級・上級の Codejump サイト制作</li>
+        <li>HTML / CSS でコーディング模写サイトを制作し、JavaScript でメニューやページ切り替えを実装した</li>
+        <li>GitHub Pages を使って自分のサイトをインターネットに公開した</li>
+        <li>Storybook に Button コンポーネントを登録し、通常・ホバー・無効の3状態を確認できる環境を作った</li>
+        <li>Figma で定義した仕様を Storybook に埋め込み、デザインと実装を並べて確認できるようにした</li>
       </ul>
     </div>
   </div>
