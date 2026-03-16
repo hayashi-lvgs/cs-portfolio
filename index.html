@@ -680,6 +680,7 @@
             <li><code>zsh: parse error near '}'</code> → TypeScript コードをターミナルに直接貼っていた。VSCode でファイルに書く</li>
           </ul>
         </div>
+        <button class="site-preview-btn" onclick="openStorybookModal()">成果物を見る →</button>
       </div>
     </div>
   </div>
@@ -780,6 +781,19 @@
   <p>OFFJT 開発学習 &nbsp;·&nbsp; 2025.11 – 2026.03</p>
 </footer>
 
+<!-- STORYBOOK MODAL -->
+<div class="site-modal-overlay" id="storybookModal" onclick="closeStorybookModalOnBg(event)">
+  <div class="site-modal" style="max-width:1100px;height:auto;max-height:90vh;">
+    <div class="site-modal-bar">
+      <span>Phase 03 — Storybook 成果物</span>
+      <button class="site-modal-close" onclick="closeStorybookModal()">✕ 閉じる</button>
+    </div>
+    <div style="overflow:auto;flex:1;">
+      <img src="./phase03-storybook.png" style="width:100%;display:block;" alt="Phase 03 Storybook 成果物" />
+    </div>
+  </div>
+</div>
+
 <!-- PDF MODAL -->
 <div class="site-modal-overlay" id="pdfModal" onclick="closePdfModalOnBg(event)">
   <div class="site-modal">
@@ -820,6 +834,18 @@
 </div>
 
 <script>
+/* ── Storybook Modal ── */
+function openStorybookModal() {
+  document.getElementById('storybookModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeStorybookModal() {
+  document.getElementById('storybookModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeStorybookModalOnBg(e) {
+  if (e.target === document.getElementById('storybookModal')) closeStorybookModal();
+}
 /* ── PDF Modal ── */
 function openPdfModal() {
   document.getElementById('pdfModal').classList.add('open');
@@ -845,7 +871,7 @@ function closeSiteModalOnBg(e) {
   if (e.target === document.getElementById('siteModal')) closeSiteModal();
 }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeSiteModal(); closePdfModal(); }
+  if (e.key === 'Escape') { closeSiteModal(); closePdfModal(); closeStorybookModal(); }
 });
 
 /* ── Scroll Reveal ── */
