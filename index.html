@@ -553,12 +553,18 @@
 
   <div class="tl-item reveal">
     <div class="tl-date">2026<br>1–2月</div>
-    <div>
-      <p class="tl-phase">Phase 03</p>
-      <h3 class="tl-heading">コンポーネント駆動開発とビルドツール</h3>
-      <p class="tl-text">React + Vite でプロジェクトを立ち上げ、Storybook に Button コンポーネントを登録。Figma（FigJam）の仕様をそのまま Storybook に埋め込む addon-designs も導入。Webpack と Vite の違いを概念から理解した。</p>
-      <div class="tl-tags">
-        <span class="tl-tag">React</span><span class="tl-tag">Vite</span><span class="tl-tag">Storybook</span><span class="tl-tag">npm</span><span class="tl-tag">Figma 連携</span>
+    <div class="tl-inner">
+      <div class="tl-inner-text">
+        <p class="tl-phase">Phase 03</p>
+        <h3 class="tl-heading">コンポーネント駆動開発とビルドツール</h3>
+        <p class="tl-text">React + Vite でプロジェクトを立ち上げ、Storybook に Button コンポーネントを登録。Figma（FigJam）の仕様をそのまま Storybook に埋め込む addon-designs も導入。Webpack と Vite の違いを概念から理解した。</p>
+        <div class="tl-tags">
+          <span class="tl-tag">React</span><span class="tl-tag">Vite</span><span class="tl-tag">Storybook</span><span class="tl-tag">npm</span><span class="tl-tag">Figma 連携</span>
+        </div>
+      </div>
+      <div class="tl-thumb-wrap" onclick="openTlStorybookModal()">
+        <iframe src="http://localhost:6006/?path=/story/components-checkbox--error" title="Phase 03 Storybook" loading="lazy" scrolling="no"></iframe>
+        <div class="tl-thumb-overlay"><span class="tl-thumb-label">Storybook を見る →</span></div>
       </div>
     </div>
   </div>
@@ -846,6 +852,17 @@
   <p>OFFJT 開発学習 &nbsp;·&nbsp; 2025.11 – 2026.03</p>
 </footer>
 
+<!-- TL STORYBOOK MODAL -->
+<div class="site-modal-overlay" id="tlStorybookModal" onclick="closeTlStorybookModalOnBg(event)">
+  <div class="site-modal" style="max-width:1100px;">
+    <div class="site-modal-bar">
+      <span>Phase 03 — Storybook</span>
+      <button class="site-modal-close" onclick="closeTlStorybookModal()">✕ 閉じる</button>
+    </div>
+    <iframe src="http://localhost:6006/?path=/story/components-checkbox--error" style="flex:1;width:100%;border:none;" title="Phase 03 Storybook"></iframe>
+  </div>
+</div>
+
 <!-- TL SAMPLE MODAL -->
 <div class="site-modal-overlay" id="tlSampleModal" onclick="closeTlSampleModalOnBg(event)">
   <div class="site-modal" style="max-width:1100px;">
@@ -917,6 +934,18 @@
 </div>
 
 <script>
+/* ── TL Storybook Modal ── */
+function openTlStorybookModal() {
+  document.getElementById('tlStorybookModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTlStorybookModal() {
+  document.getElementById('tlStorybookModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeTlStorybookModalOnBg(e) {
+  if (e.target === document.getElementById('tlStorybookModal')) closeTlStorybookModal();
+}
 /* ── TL Sample Modal ── */
 function openTlSampleModal() {
   document.getElementById('tlSampleModal').classList.add('open');
@@ -966,7 +995,7 @@ function closeSiteModalOnBg(e) {
   if (e.target === document.getElementById('siteModal')) closeSiteModal();
 }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeSiteModal(); closePdfModal(); closeStorybookModal(); closeTlSampleModal(); }
+  if (e.key === 'Escape') { closeSiteModal(); closePdfModal(); closeStorybookModal(); closeTlSampleModal(); closeTlStorybookModal(); }
 });
 
 /* ── Glossary ── */
