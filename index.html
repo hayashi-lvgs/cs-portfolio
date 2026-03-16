@@ -376,6 +376,34 @@
       flex: 1; width: 100%; border: none;
     }
 
+    /* ── TL THUMBNAIL ── */
+    .tl-inner {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 28px;
+    }
+    .tl-inner-text { flex: 1; min-width: 0; }
+    .tl-thumb-wrap {
+      flex-shrink: 0; width: 220px; height: 140px;
+      overflow: hidden; position: relative;
+      border: 1px solid var(--line); cursor: pointer;
+    }
+    .tl-thumb-wrap iframe {
+      width: 1100px; height: 700px;
+      transform: scale(0.2); transform-origin: top left;
+      pointer-events: none;
+    }
+    .tl-thumb-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0); transition: background 0.2s;
+      display: flex; align-items: flex-end; padding: 8px;
+    }
+    .tl-thumb-wrap:hover .tl-thumb-overlay { background: rgba(0,0,0,0.45); }
+    .tl-thumb-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #fff;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .tl-thumb-wrap:hover .tl-thumb-label { opacity: 1; }
+
     /* ── GLOSSARY ── */
     .gl {
       color: var(--accent);
@@ -507,12 +535,18 @@
 
   <div class="tl-item reveal">
     <div class="tl-date">2025<br>12月</div>
-    <div>
-      <p class="tl-phase">Phase 02</p>
-      <h3 class="tl-heading">実践的なサイト構築とバージョン管理</h3>
-      <p class="tl-text">中級・上級の Codejump サイトを制作。JavaScript でハンバーガーメニュー・ページ遷移・ページネーションを実装。Homebrew・Git・GitHub を導入し、VSCode からリポジトリを公開する一連のフローを習得した。</p>
-      <div class="tl-tags">
-        <span class="tl-tag">ハンバーガーメニュー</span><span class="tl-tag">ページネーション</span><span class="tl-tag">Git / GitHub</span><span class="tl-tag">GitHub Pages</span><span class="tl-tag">Homebrew</span>
+    <div class="tl-inner">
+      <div class="tl-inner-text">
+        <p class="tl-phase">Phase 02</p>
+        <h3 class="tl-heading">実践的なサイト構築とバージョン管理</h3>
+        <p class="tl-text">中級・上級の Codejump サイトを制作。JavaScript でハンバーガーメニュー・ページ遷移・ページネーションを実装。Homebrew・Git・GitHub を導入し、VSCode からリポジトリを公開する一連のフローを習得した。</p>
+        <div class="tl-tags">
+          <span class="tl-tag">ハンバーガーメニュー</span><span class="tl-tag">ページネーション</span><span class="tl-tag">Git / GitHub</span><span class="tl-tag">GitHub Pages</span><span class="tl-tag">Homebrew</span>
+        </div>
+      </div>
+      <div class="tl-thumb-wrap" onclick="openTlSampleModal()">
+        <iframe src="https://takahikoaizawa-com.github.io/sample/" title="Phase 02 成果物サイト" loading="lazy" scrolling="no"></iframe>
+        <div class="tl-thumb-overlay"><span class="tl-thumb-label">サイトを見る →</span></div>
       </div>
     </div>
   </div>
@@ -812,6 +846,17 @@
   <p>OFFJT 開発学習 &nbsp;·&nbsp; 2025.11 – 2026.03</p>
 </footer>
 
+<!-- TL SAMPLE MODAL -->
+<div class="site-modal-overlay" id="tlSampleModal" onclick="closeTlSampleModalOnBg(event)">
+  <div class="site-modal" style="max-width:1100px;">
+    <div class="site-modal-bar">
+      <span>Phase 02 — 成果物サイト</span>
+      <button class="site-modal-close" onclick="closeTlSampleModal()">✕ 閉じる</button>
+    </div>
+    <iframe src="https://takahikoaizawa-com.github.io/sample/" style="flex:1;width:100%;border:none;" title="Phase 02 成果物サイト"></iframe>
+  </div>
+</div>
+
 <!-- GLOSSARY POPUP -->
 <div id="gl-popup" role="tooltip">
   <button id="gl-popup-close" onclick="document.getElementById('gl-popup').classList.remove('open')">✕</button>
@@ -872,6 +917,18 @@
 </div>
 
 <script>
+/* ── TL Sample Modal ── */
+function openTlSampleModal() {
+  document.getElementById('tlSampleModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTlSampleModal() {
+  document.getElementById('tlSampleModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeTlSampleModalOnBg(e) {
+  if (e.target === document.getElementById('tlSampleModal')) closeTlSampleModal();
+}
 /* ── Storybook Modal ── */
 function openStorybookModal() {
   document.getElementById('storybookModal').classList.add('open');
@@ -909,7 +966,7 @@ function closeSiteModalOnBg(e) {
   if (e.target === document.getElementById('siteModal')) closeSiteModal();
 }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeSiteModal(); closePdfModal(); closeStorybookModal(); }
+  if (e.key === 'Escape') { closeSiteModal(); closePdfModal(); closeStorybookModal(); closeTlSampleModal(); }
 });
 
 /* ── Glossary ── */
