@@ -1,0 +1,366 @@
+/* ===========================
+   ベース
+=========================== */
+*,
+*::before,
+*::after {
+  
+  box-sizing: border-box;
+  /* ボックスの外側の幅を指定することができる
+   paddingとかで外側にはみ出す仕様になったとしても外側は変わらない*/
+  
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  line-height: 1.6;
+  /* 行と行の間の高さ（行間）を、文字サイズの 1.6 倍にする指定。*/
+  color: #333;
+  background-color: #fff;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  /*中身の量に合わせて高さを自動で決める（「勝手にちょうどいい高さになる」**設定。 */
+  display: block;
+  /*要素を「ブロック要素」として扱う （横幅は基本 親要素いっぱい
+　　　前後で 改行される */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.7;
+}
+
+.wrapper {
+  max-width: 1360px;
+  padding: 0 40px;
+  margin: 0 auto;
+}
+
+.content {
+  padding: 40px 0 80px;
+}
+
+/* ===========================
+   ヘッダー
+=========================== */
+/* ==== ヘッダーの基本レイアウト ==== */
+#header {
+  display: flex;
+  /*子要素が 横並び になる */
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0;
+}
+
+.site-title a {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+
+/* ==== 左からスライドするメニュー ==== */
+#navi {
+  position: fixed;
+  /*「画面に固定する」指定。*/
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background-color: #222;
+  color: #fff;
+  padding-top: 80px;
+  transform: translateX(-100%);
+  /*「自分の幅ぶん、左にスライドさせる」指定。*/
+  transition: transform 0.35s ease;
+  z-index: 2000;
+}
+
+.nav-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-left: 24px;
+}
+
+.nav-menu li a {
+  color: #fff;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+/* ==== ハンバーガーボタン（常に表示） ==== */
+.toggle-btn {
+  display: block;
+  position: relative;
+  width: 32px;
+  height: 24px;
+  cursor: pointer;
+  z-index: 3000; /* メニューより手前 */
+}
+
+.toggle-btn span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #333;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn span:nth-child(1) {
+  top: 6px;
+}
+
+.toggle-btn span:nth-child(2) {
+  top: 16px;
+}
+
+/* ==== 背景を暗くするマスク ==== */
+#mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 1500;
+}
+
+/* ==== メニューが開いているときの状態 ==== */
+body.menu-open #navi {
+  transform: translateX(0);       /* 左からスライドイン */
+}
+
+body.menu-open #mask {
+  display: block;                 /* 黒幕表示 */
+}
+
+/* ハンバーガーを × に変形 */
+body.menu-open .toggle-btn span:nth-child(1) {
+  top: 11px;
+  transform: rotate(45deg);
+  background-color: #fff;
+}
+
+body.menu-open .toggle-btn span:nth-child(2) {
+  top: 11px;
+  transform: rotate(-45deg);
+  background-color: #fff;
+}
+
+/* メニュー開いている間はページスクロール禁止 */
+body.menu-open {
+  overflow: hidden;
+}
+
+
+/* ===========================
+   フッター
+=========================== */
+#footer {
+  padding: 40px 0 24px;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+#footer .menu {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+/* ===========================
+   共通コンポーネント
+=========================== */
+
+.page-title {
+  font-size: 1.6rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 32px;
+}
+
+/* 商品グリッド */
+.product-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.product-list a {
+  display: block;
+}
+
+.product-list p {
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+/* テキストリンク */
+.link-text {
+  display: inline-block;
+  margin-top: 32px;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid #333;
+}
+
+/* ページネーション */
+.pagination {
+  list-style: none;
+  display: flex;
+  gap: 12px;
+  margin-top: 40px;
+  font-size: 0.9rem;
+}
+
+.pagination li {
+  padding: 4px 10px;
+  border: 1px solid #ddd;
+}
+
+.pagination li a {
+  display: block;
+}
+
+/* ===========================
+   商品詳細
+=========================== */
+#item {
+  display: flex;
+  gap: 40px;
+}
+
+.item-img {
+  flex: 1;
+}
+
+.item-text {
+  flex: 1;
+}
+
+.item-text p {
+  margin-bottom: 16px;
+}
+
+.item-text dl {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  row-gap: 8px;
+}
+
+.item-text dt {
+  font-weight: bold;
+}
+
+/* ===========================
+   About / Company
+=========================== */
+#about p + p {
+  margin-top: 16px;
+}
+
+.company-info {
+  margin-top: 24px;
+  font-size: 0.9rem;
+}
+
+.company-info dl {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  row-gap: 8px;
+}
+
+.map-wrapper {
+  margin-top: 32px;
+}
+
+.map-wrapper iframe {
+  width: 100%;
+  height: 360px;
+  border: 0;
+  filter: grayscale(100%);
+}
+
+/* ===========================
+   レスポンシブ
+=========================== */
+@media (max-width: 900px) {
+  .wrapper {
+    padding: 0 20px;
+  }
+
+  #header {
+    position: relative;
+  }
+
+  #navi {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: 70%;
+    max-width: 320px;
+    background-color: #fff;
+    transform: translateX(100%);
+    transition: transform 0.3s;
+    padding-top: 80px;
+  }
+
+  .nav-menu {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 24px;
+  }
+
+  .toggle-btn {
+    display: block;
+  }
+
+  #mask {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  body.menu-open #navi {
+    transform: translateX(0);
+  }
+
+  body.menu-open #mask {
+    display: block;
+  }
+
+  body.menu-open .toggle-btn span:nth-child(1) {
+    top: 11px;
+    transform: rotate(45deg);
+  }
+
+  body.menu-open .toggle-btn span:nth-child(2) {
+    top: 11px;
+    transform: rotate(-45deg);
+  }
+
+  .product-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  #item {
+    flex-direction: column;
+  }
+}
