@@ -4,7 +4,8 @@
       "Bash(python3:*)",
       "Bash(cp:*)",
       "Bash(git add:*)",
-      "Bash(claude-monitor:*)"
+      "Bash(claude-monitor:*)",
+      "Bash(cd:*)"
     ]
   }
 }
