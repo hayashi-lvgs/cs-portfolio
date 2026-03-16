@@ -936,7 +936,6 @@ document.addEventListener('keydown', function(e) {
     'Webpack':                { t: 'Webpack',                   b: '複数のJavaScriptファイルを1つにまとめる（バンドルする）ツール。大規模・レガシープロジェクトで広く使われる。' },
     'Flexbox':                { t: 'Flexbox',                   b: 'CSSのレイアウト機能。要素を横並び・縦並びに柔軟に配置でき、中央寄せや均等配置も簡単に実現できる。' },
     'GitHub':                 { t: 'GitHub',                    b: 'Gitで管理したコードをインターネット上で保存・共有できるサービス。チームでの共同開発にも使われる。' },
-    'Figma':                  { t: 'Figma',                     b: 'ブラウザで動くUIデザインツール。デザイナーがレイアウト・コンポーネントの仕様を作成・共有するために使われる。' },
     'React':                  { t: 'React',                     b: 'Meta（旧Facebook）が開発したJavaScriptライブラリ。UIを「コンポーネント」という再利用可能な部品に分けて構築できる。' },
     'reset.css':              { t: 'reset.css',                 b: 'ブラウザごとに異なるデフォルトのスタイルをゼロにリセットするCSSファイル。どのブラウザでも同じ見た目から始めるための出発点。' },
     'CSSOM':                  { t: 'CSSOM',                     b: 'CSSをブラウザが読み込んで作るデータ構造。DOMと組み合わせてレンダーツリーを生成し、画面表示に使われる。' },
@@ -962,6 +961,8 @@ document.addEventListener('keydown', function(e) {
   const re = new RegExp('(' + terms.map(esc).join('|') + ')');
   const SKIP = new Set(['CODE','PRE','SCRIPT','STYLE','A','BUTTON','H1','H2','H3','H4']);
 
+  const seen = new Set();
+
   function walk(root) {
     const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode(n) {
@@ -980,7 +981,8 @@ document.addEventListener('keydown', function(e) {
       if (parts.length <= 1) return;
       const frag = document.createDocumentFragment();
       parts.forEach(p => {
-        if (G[p]) {
+        if (G[p] && !seen.has(p)) {
+          seen.add(p);
           const s = document.createElement('span');
           s.className = 'gl'; s.dataset.gl = p; s.textContent = p;
           frag.appendChild(s);
