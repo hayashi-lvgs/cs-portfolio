@@ -474,7 +474,6 @@
       <div class="tl-tags">
         <span class="tl-tag">ハンバーガーメニュー</span><span class="tl-tag">ページネーション</span><span class="tl-tag">Git / GitHub</span><span class="tl-tag">GitHub Pages</span><span class="tl-tag">Homebrew</span>
       </div>
-      <button class="site-preview-btn" onclick="openSiteModal()">成果物サイトを見る →</button>
     </div>
   </div>
 
@@ -590,6 +589,7 @@
             <li><strong>GitHub Pages が反映されない</strong> → Settings → Pages → main ブランチを指定して Save</li>
           </ul>
         </div>
+        <button class="site-preview-btn" onclick="openSiteModal()">成果物サイトを見る →</button>
       </div>
     </div>
   </div>
@@ -785,19 +785,16 @@
       <span>Phase 02 — 成果物サイト</span>
       <button class="site-modal-close" onclick="closeSiteModal()">✕ 閉じる</button>
     </div>
-    <iframe id="siteModalFrame" src="" title="Phase 02 成果物サイト"></iframe>
+    <div style="flex:1;overflow-y:auto;background:#f5f5f5;display:flex;align-items:flex-start;justify-content:center;padding:0;">
+      <img src="./phase02-screenshot.png" alt="Phase 02 成果物サイト" style="width:100%;display:block;" />
+    </div>
   </div>
 </div>
 
 <script>
 /* ── Site Modal ── */
 function openSiteModal() {
-  const modal = document.getElementById('siteModal');
-  const frame = document.getElementById('siteModalFrame');
-  if (!frame.src || frame.src === window.location.href) {
-    frame.src = '../../Desktop/開発Offjt/index.html';
-  }
-  modal.classList.add('open');
+  document.getElementById('siteModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 function closeSiteModal() {
