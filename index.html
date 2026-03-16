@@ -543,6 +543,7 @@
           <p class="learn-item-text">変数・関数・<code>querySelector</code>・<code>addEventListener</code> を学び、「ボタンを押すと色が変わる」インタラクションを初めて自作した。</p>
         </div>
       </div>
+      <button class="site-preview-btn" onclick="openPdfModal()" style="margin-top:18px;">学習ノートを見る →</button>
     </div>
   </div>
 
@@ -778,6 +779,17 @@
   <p>OFFJT 開発学習 &nbsp;·&nbsp; 2025.11 – 2026.03</p>
 </footer>
 
+<!-- PDF MODAL -->
+<div class="site-modal-overlay" id="pdfModal" onclick="closePdfModalOnBg(event)">
+  <div class="site-modal">
+    <div class="site-modal-bar">
+      <span>Phase 01 — 学習ノート（進捗まとめ PDF）</span>
+      <button class="site-modal-close" onclick="closePdfModal()">✕ 閉じる</button>
+    </div>
+    <iframe src="./phase01-notes.pdf" style="flex:1;width:100%;border:none;" title="Phase 01 学習ノート"></iframe>
+  </div>
+</div>
+
 <!-- SITE MODAL -->
 <div class="site-modal-overlay" id="siteModal" onclick="closeSiteModalOnBg(event)">
   <div class="site-modal">
@@ -792,6 +804,18 @@
 </div>
 
 <script>
+/* ── PDF Modal ── */
+function openPdfModal() {
+  document.getElementById('pdfModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePdfModal() {
+  document.getElementById('pdfModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closePdfModalOnBg(e) {
+  if (e.target === document.getElementById('pdfModal')) closePdfModal();
+}
 /* ── Site Modal ── */
 function openSiteModal() {
   document.getElementById('siteModal').classList.add('open');
@@ -805,7 +829,7 @@ function closeSiteModalOnBg(e) {
   if (e.target === document.getElementById('siteModal')) closeSiteModal();
 }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeSiteModal();
+  if (e.key === 'Escape') { closeSiteModal(); closePdfModal(); }
 });
 
 /* ── Scroll Reveal ── */
