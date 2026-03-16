@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>デザイナーがコードとAIを用いて — HAYASHI & AIZAWA</title>
+  <style>
+    :root {
+      --bg: #0b0b0b;
+      --fg: #ececec;
+      --fg-muted: #666;
+      --fg-dim: #2e2e2e;
+      --accent: #f2c94c;
+      --line: #1c1c1c;
+      --mono: "SF Mono", "Fira Code", "Inconsolata", monospace;
+      --sans: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--sans);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--accent); color: #000; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+      padding: 20px 48px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .nav-name {
+      font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fg-muted); text-decoration: none;
+    }
+
+    .nav-right { display: flex; gap: 28px; list-style: none; }
+
+    .nav-right a {
+      font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--fg-muted); text-decoration: none;
+      position: relative; transition: color 0.2s;
+    }
+
+    .nav-right a::after {
+      content: ""; position: absolute; left: 0; bottom: -2px;
+      width: 100%; height: 1px; background: var(--fg);
+      transform: scaleX(0); transform-origin: right;
+      transition: transform 0.35s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+
+    .nav-right a:hover { color: var(--fg); }
+    .nav-right a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh; padding: 0 48px 72px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em;
+      color: var(--fg-muted); text-transform: uppercase; margin-bottom: 22px;
+    }
+
+    /* title wrapper — needed for canvas overlay */
+    .hero-title-wrap {
+      position: relative;
+      display: block;
+      margin-bottom: 36px;
+    }
+
+    .hero-title {
+      font-size: clamp(38px, 6.5vw, 90px);
+      font-weight: 700; line-height: 1.05; letter-spacing: -0.03em;
+      position: relative; z-index: 1;
+    }
+
+    .hero-title em { font-style: normal; color: var(--accent); }
+
+.hero-row {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      border-top: 1px solid var(--line); padding-top: 22px;
+      flex-wrap: wrap; gap: 16px;
+    }
+
+    .hero-desc {
+      max-width: 460px; font-size: 15px; color: var(--fg-muted); line-height: 1.8;
+    }
+
+    .hero-meta { text-align: right; }
+
+    .hero-meta-name {
+      font-size: 15px; font-weight: 600; letter-spacing: 0.06em; margin-bottom: 6px;
+    }
+
+    .hero-meta-name span {
+      color: var(--fg-muted); font-weight: 400; font-size: 14px;
+      margin: 0 6px;
+    }
+
+    .hero-meta p {
+      font-family: var(--mono); font-size: 12px; color: var(--fg-muted);
+      letter-spacing: 0.08em; line-height: 2;
+    }
+
+    .stack-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; justify-content: flex-end; }
+
+    .stack-item {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em;
+      color: var(--fg-dim); border: 1px solid var(--fg-dim); padding: 2px 7px;
+    }
+
+    /* ── SECTION ── */
+    .section { padding: 110px 48px; border-top: 1px solid var(--line); }
+
+    .ch {
+      display: grid; grid-template-columns: 72px 1fr;
+      gap: 36px; align-items: baseline; margin-bottom: 72px;
+    }
+
+    .ch-num {
+      font-family: var(--mono); font-size: 13px; color: var(--fg-dim);
+      letter-spacing: 0.1em; padding-top: 5px;
+    }
+
+    .ch-title {
+      font-size: clamp(28px, 4vw, 46px);
+      font-weight: 700; letter-spacing: -0.03em; line-height: 1.1;
+    }
+
+    .ch-title span { color: var(--accent); }
+
+    /* ── TIMELINE ── */
+    .tl-item {
+      display: grid; grid-template-columns: 72px 1fr;
+      gap: 36px; padding: 44px 0; border-bottom: 1px solid var(--line);
+    }
+
+    .tl-item:first-child { border-top: 1px solid var(--line); }
+
+    .tl-date {
+      font-family: var(--mono); font-size: 12px; color: var(--fg-muted);
+      letter-spacing: 0.1em; padding-top: 5px; line-height: 1.8;
+    }
+
+    .tl-phase {
+      font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); font-family: var(--mono); margin-bottom: 10px;
+    }
+
+    .tl-heading {
+      font-size: clamp(19px, 2.2vw, 24px);
+      font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 14px;
+    }
+
+    .tl-text { font-size: 15px; color: var(--fg-muted); max-width: 600px; line-height: 1.85; }
+
+    .tl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+
+    .tl-tag {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+      color: var(--fg-dim); border: 1px solid var(--fg-dim);
+      padding: 2px 6px; text-transform: uppercase;
+    }
+
+    /* ── LEARN BLOCK ── */
+    .learn-block { padding: 72px 0; border-bottom: 1px solid var(--line); }
+    .learn-block:last-child { border-bottom: none; }
+
+    .lb-header { display: grid; grid-template-columns: 72px 1fr; gap: 36px; margin-bottom: 48px; }
+
+    .lb-num { font-family: var(--mono); font-size: 12px; color: var(--fg-dim); padding-top: 4px; }
+
+    .lb-phase-label {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em;
+      color: var(--accent); text-transform: uppercase; margin-bottom: 8px;
+    }
+
+    .lb-title {
+      font-size: clamp(22px, 3vw, 34px);
+      font-weight: 700; letter-spacing: -0.025em; line-height: 1.15;
+    }
+
+    .lb-period {
+      font-family: var(--mono); font-size: 12px; color: var(--fg-muted); margin-top: 8px;
+    }
+
+    .lb-body { display: grid; grid-template-columns: 72px 1fr; gap: 36px; }
+
+    .learn-items { display: grid; grid-template-columns: 1fr 1fr; }
+
+    .learn-item {
+      padding: 26px 0; border-bottom: 1px solid var(--line); padding-right: 36px;
+    }
+
+    .learn-item:nth-child(odd) { border-right: 1px solid var(--line); }
+    .learn-item:nth-child(even) { padding-left: 36px; padding-right: 0; }
+
+    .learn-item-label {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+      color: var(--fg-muted); text-transform: uppercase; margin-bottom: 7px;
+    }
+
+    .learn-item-title { font-size: 16px; font-weight: 600; margin-bottom: 7px; letter-spacing: -0.01em; }
+
+    .learn-item-text { font-size: 14px; color: var(--fg-muted); line-height: 1.8; }
+
+    /* ── CODE ── */
+    code {
+      font-family: var(--mono); font-size: 0.82em;
+      color: var(--accent); background: rgba(242,201,76,0.08); padding: 1px 5px;
+    }
+
+    .codeblock {
+      margin: 28px 0; background: #0f0f0f;
+      border: 1px solid var(--line); padding: 24px 28px; overflow-x: auto;
+    }
+
+    .codeblock-label {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+      color: var(--fg-dim); text-transform: uppercase; margin-bottom: 14px;
+    }
+
+    .codeblock pre {
+      font-family: var(--mono); font-size: 13.5px; line-height: 1.9; color: #999;
+    }
+
+    .codeblock pre .kw  { color: #e06c75; }
+    .codeblock pre .ty  { color: #61afef; }
+    .codeblock pre .st  { color: #98c379; }
+    .codeblock pre .cm  { color: #4a4a4a; }
+
+    /* ── NOTE ── */
+    .note {
+      padding: 20px 0 20px 20px; border-left: 2px solid var(--fg-dim); margin: 28px 0;
+    }
+
+    .note-label {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+      color: var(--fg-muted); text-transform: uppercase; margin-bottom: 10px;
+    }
+
+    .note-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+    .note-list li {
+      font-size: 14px; color: var(--fg-muted); line-height: 1.7;
+      display: flex; gap: 10px;
+    }
+
+    .note-list li::before { content: "—"; color: var(--fg-dim); flex-shrink: 0; }
+
+    /* ── COMPARE ── */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); margin: 28px 0; }
+
+    .compare-col { padding: 28px; }
+    .compare-col + .compare-col { border-left: 1px solid var(--line); }
+
+    .compare-col-label {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; margin-bottom: 18px;
+    }
+
+    .compare-col.col-a .compare-col-label { color: var(--fg-dim); }
+    .compare-col.col-b .compare-col-label { color: var(--accent); }
+
+    .compare-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+
+    .compare-list li {
+      font-size: 14px; color: var(--fg-muted); line-height: 1.7;
+      display: flex; gap: 8px;
+    }
+
+    .compare-list li::before { content: "·"; color: var(--fg-dim); }
+
+    /* ── FLOW ── */
+    .flow { display: flex; border: 1px solid var(--line); margin: 28px 0; flex-wrap: wrap; }
+
+    .flow-step { padding: 18px 22px; flex: 1 1 0; min-width: 120px; }
+    .flow-step + .flow-step { border-left: 1px solid var(--line); }
+
+    .flow-step-num {
+      font-family: var(--mono); font-size: 11px; color: var(--fg-dim);
+      letter-spacing: 0.1em; margin-bottom: 6px;
+    }
+
+    .flow-step-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+    .flow-step-sub { font-size: 12px; color: var(--fg-muted); }
+
+    /* ── SUMMARY ── */
+    .summary-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+
+    .s-col { padding: 36px 0; padding-right: 44px; }
+
+    .s-col + .s-col { padding-left: 44px; border-left: 1px solid var(--line); }
+
+    .s-col:last-child { padding-right: 0; }
+
+    .s-col-label {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--fg-muted);
+      margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line);
+    }
+
+    .s-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+
+    .s-list li {
+      font-size: 14px; color: var(--fg-muted); line-height: 1.7; display: flex; gap: 9px;
+    }
+
+    .s-list li::before { content: "—"; color: var(--fg-dim); flex-shrink: 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--line); padding: 36px 48px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+
+    footer p { font-family: var(--mono); font-size: 13px; color: var(--fg-muted); letter-spacing: 0.06em; }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+    .reveal:nth-child(2) { transition-delay: 0.07s; }
+    .reveal:nth-child(3) { transition-delay: 0.14s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-right { display: none; }
+      #hero { padding: 0 20px 56px; }
+      .section { padding: 72px 20px; }
+      .ch, .tl-item, .lb-header, .lb-body { grid-template-columns: 1fr; gap: 8px; }
+      .ch-num, .lb-num { display: none; }
+      .learn-items { grid-template-columns: 1fr; }
+      .learn-item:nth-child(odd) { border-right: none; }
+      .learn-item:nth-child(even) { padding-left: 0; }
+      .summary-cols { grid-template-columns: 1fr; }
+      .s-col { padding: 28px 0 !important; border-left: none !important; }
+      .compare, .flow { grid-template-columns: 1fr; flex-direction: column; }
+      .compare-col + .compare-col { border-left: none; border-top: 1px solid var(--line); }
+      .flow-step + .flow-step { border-left: none; border-top: 1px solid var(--line); }
+      footer { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-name" href="#hero">Hayashi &amp; Aizawa</a>
+  <ul class="nav-right">
+    <li><a href="#timeline">軌跡</a></li>
+    <li><a href="#phases">学習内容</a></li>
+    <li><a href="#summary">まとめ</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <p class="hero-eyebrow">OFFJT — Learning Log &nbsp;·&nbsp; 2025.11 – 2026.03</p>
+
+  <div class="hero-title-wrap">
+    <h1 class="hero-title">
+      デザイナーが<br>
+      <em>コードとAI</em>を用いて<br>
+      開発のお勉強をしてみた
+    </h1>
+  </div>
+
+  <div class="hero-row">
+    <p class="hero-desc">
+      デザイナー2人がフロントエンド開発とAIツールを実践し、基礎知識からモダンツールまで
+      横断的に理解を深めた約4ヶ月の記録。HTML/CSSの写経から始まり、React + Storybookによる
+      UIカタログ構築まで到達した。
+    </p>
+    <div class="hero-meta">
+      <p class="hero-meta-name">
+        HARUYA HAYASHI<span>&amp;</span>TAKAHIKO AIZAWA
+      </p>
+      <p>OFFJT 開発学習 &nbsp;·&nbsp; 2026</p>
+      <div class="stack-row">
+        <span class="stack-item">HTML / CSS / JS</span>
+        <span class="stack-item">React</span>
+        <span class="stack-item">Vite</span>
+        <span class="stack-item">Storybook</span>
+        <span class="stack-item">Git</span>
+        <span class="stack-item">TypeScript</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline" class="section">
+  <div class="ch reveal">
+    <span class="ch-num">00</span>
+    <h2 class="ch-title">4ヶ月の<span>学習軌跡</span></h2>
+  </div>
+
+  <div class="tl-item reveal">
+    <div class="tl-date">2025<br>11月</div>
+    <div>
+      <p class="tl-phase">Phase 01</p>
+      <h3 class="tl-heading">Webの基礎と静的コーディング</h3>
+      <p class="tl-text">インターネットの仕組みを体系的に整理。URL を入力してからブラウザに表示されるまでの9ステップ（DNS 問い合わせ → HTTP リクエスト → レンダリング）を学習。HTML/CSS の基礎・reset.css・Flexbox レイアウト・JavaScript 入門まで到達。</p>
+      <div class="tl-tags">
+        <span class="tl-tag">HTML</span><span class="tl-tag">CSS</span><span class="tl-tag">JavaScript</span><span class="tl-tag">DOM</span><span class="tl-tag">HTTP</span><span class="tl-tag">DNS</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-item reveal">
+    <div class="tl-date">2025<br>12月</div>
+    <div>
+      <p class="tl-phase">Phase 02</p>
+      <h3 class="tl-heading">実践的なサイト構築とバージョン管理</h3>
+      <p class="tl-text">中級・上級の Codejump サイトを制作。JavaScript でハンバーガーメニュー・ページ遷移・ページネーションを実装。Homebrew・Git・GitHub を導入し、VSCode からリポジトリを公開する一連のフローを習得した。</p>
+      <div class="tl-tags">
+        <span class="tl-tag">ハンバーガーメニュー</span><span class="tl-tag">ページネーション</span><span class="tl-tag">Git / GitHub</span><span class="tl-tag">GitHub Pages</span><span class="tl-tag">Homebrew</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-item reveal">
+    <div class="tl-date">2026<br>1–2月</div>
+    <div>
+      <p class="tl-phase">Phase 03</p>
+      <h3 class="tl-heading">コンポーネント駆動開発とビルドツール</h3>
+      <p class="tl-text">React + Vite でプロジェクトを立ち上げ、Storybook に Button コンポーネントを登録。Figma（FigJam）の仕様をそのまま Storybook に埋め込む addon-designs も導入。Webpack と Vite の違いを概念から理解した。</p>
+      <div class="tl-tags">
+        <span class="tl-tag">React</span><span class="tl-tag">Vite</span><span class="tl-tag">Storybook</span><span class="tl-tag">npm</span><span class="tl-tag">Figma 連携</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-item reveal">
+    <div class="tl-date">2026<br>3月</div>
+    <div>
+      <p class="tl-phase">Phase 04</p>
+      <h3 class="tl-heading">高度な実装とフレームワークの深化</h3>
+      <p class="tl-text">TypeScript で Button コンポーネントを型安全に実装。<code>visualState</code> props による hover/disabled の固定表示、Storybook Controls でのインタラクティブなカタログを完成させた。パス空白・ターミナルエラーなど現場レベルの詰まりポイントも自力で解決。</p>
+      <div class="tl-tags">
+        <span class="tl-tag">TypeScript</span><span class="tl-tag">Button Component</span><span class="tl-tag">Storybook Controls</span><span class="tl-tag">トラブルシューティング</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASES DETAIL -->
+<section id="phases" class="section">
+  <div class="ch reveal">
+    <span class="ch-num">01</span>
+    <h2 class="ch-title">学習の<span>詳細</span></h2>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="learn-block reveal">
+    <div class="lb-header">
+      <span class="lb-num">01</span>
+      <div>
+        <p class="lb-phase-label">Phase 01 / 2025年11月</p>
+        <h3 class="lb-title">Webの基礎と<br>静的コーディング</h3>
+        <p class="lb-period">2025.11 — HTML · CSS · JavaScript · レンダリング</p>
+      </div>
+    </div>
+    <div class="lb-body">
+      <span></span>
+      <div class="learn-items">
+        <div class="learn-item">
+          <p class="learn-item-label">01 — インターネットの仕組み</p>
+          <h4 class="learn-item-title">URL 入力から表示まで</h4>
+          <p class="learn-item-text">DNS 問い合わせ・IP 取得・TCP 接続・HTTP リクエスト/レスポンス・レンダリングの9ステップを体系的に整理した。</p>
+        </div>
+        <div class="learn-item">
+          <p class="learn-item-label">02 — レンダリング</p>
+          <h4 class="learn-item-title">DOM / CSSOM / レンダーツリー</h4>
+          <p class="learn-item-text">HTML → DOM ツリー、CSS → CSSOM ツリー、合成 → レイアウト → ペイントの流れを理解。JS 操作でリフローが発生するコストも把握。</p>
+        </div>
+        <div class="learn-item">
+          <p class="learn-item-label">03 — HTML / CSS</p>
+          <h4 class="learn-item-title">マークアップと Flexbox</h4>
+          <p class="learn-item-text">セマンティックタグ・Box Model・Flexbox レイアウトを習得。reset.css でブラウザ差異をゼロにするところから始めた。</p>
+        </div>
+        <div class="learn-item">
+          <p class="learn-item-label">04 — JavaScript</p>
+          <h4 class="learn-item-title">DOM 操作の第一歩</h4>
+          <p class="learn-item-text">変数・関数・<code>querySelector</code>・<code>addEventListener</code> を学び、「ボタンを押すと色が変わる」インタラクションを初めて自作した。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="learn-block reveal">
+    <div class="lb-header">
+      <span class="lb-num">02</span>
+      <div>
+        <p class="lb-phase-label">Phase 02 / 2025年12月</p>
+        <h3 class="lb-title">実践的なサイト構築と<br>バージョン管理</h3>
+        <p class="lb-period">2025.12 — JavaScript · Git · GitHub · Homebrew</p>
+      </div>
+    </div>
+    <div class="lb-body">
+      <span></span>
+      <div>
+        <div class="learn-items">
+          <div class="learn-item">
+            <p class="learn-item-label">01 — JavaScript 実践</p>
+            <h4 class="learn-item-title">ハンバーガーメニュー</h4>
+            <p class="learn-item-text"><code>body.menu-open</code> クラスをトグルし、CSS でスライドイン・背景マスクを制御。CSS 単体ではクリック後の挙動を指定できないと理解した。</p>
+          </div>
+          <div class="learn-item">
+            <p class="learn-item-label">02 — JavaScript 実践</p>
+            <h4 class="learn-item-title">ページネーション</h4>
+            <p class="learn-item-text"><code>data-page</code> 属性で商品を分類し、ページ番号クリックで表示切り替え。<code>querySelectorAll</code> で複数要素を一括操作する手法を習得。</p>
+          </div>
+          <div class="learn-item">
+            <p class="learn-item-label">03 — バージョン管理</p>
+            <h4 class="learn-item-title">Git / GitHub 連携</h4>
+            <p class="learn-item-text">commit（ローカル保存）→ push（リモート共有）のフローを体得。VSCode から「Publish to GitHub」で自動連携、GitHub Pages で公開。</p>
+          </div>
+          <div class="learn-item">
+            <p class="learn-item-label">04 — 環境構築</p>
+            <h4 class="learn-item-title">Homebrew の役割</h4>
+            <p class="learn-item-text">Mac の開発ツール（Git・Node.js・gh CLI）を一括管理。<code>brew install node</code> だけで環境が整う便利さを実感した。</p>
+          </div>
+        </div>
+        <div class="note">
+          <p class="note-label">よくあったエラーと対処</p>
+          <ul class="note-list">
+            <li><strong>fatal: git protocol</strong> → origin を <code>git://</code> から <code>https://</code> に変更して解決</li>
+            <li><strong>no upstream branch</strong> → <code>git push --set-upstream origin main</code> を実行</li>
+            <li><strong>GitHub Pages が反映されない</strong> → Settings → Pages → main ブランチを指定して Save</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="learn-block reveal">
+    <div class="lb-header">
+      <span class="lb-num">03</span>
+      <div>
+        <p class="lb-phase-label">Phase 03 / 2026年1–2月</p>
+        <h3 class="lb-title">コンポーネント駆動開発と<br>ビルドツール</h3>
+        <p class="lb-period">2026.01–02 — React · Vite · Storybook · Figma</p>
+      </div>
+    </div>
+    <div class="lb-body">
+      <span></span>
+      <div>
+        <p style="font-size:15px;color:var(--fg-muted);line-height:1.85;max-width:600px;margin-bottom:28px;">単なる HTML ファイル制作から一歩進み、モダンなフロントエンド開発のワークフローへ移行した。Figma（FigJam）で定義した仕様を React コンポーネントとして実装し、Storybook でカタログ化する一連の流れを習得。</p>
+
+        <div class="flow">
+          <div class="flow-step">
+            <p class="flow-step-num">01</p>
+            <p class="flow-step-title">Figma (FigJam)</p>
+            <p class="flow-step-sub">variant / size / state / width の仕様定義</p>
+          </div>
+          <div class="flow-step">
+            <p class="flow-step-num">02</p>
+            <p class="flow-step-title">Button.tsx</p>
+            <p class="flow-step-sub">React + TypeScript で実装</p>
+          </div>
+          <div class="flow-step">
+            <p class="flow-step-num">03</p>
+            <p class="flow-step-title">Button.stories.ts</p>
+            <p class="flow-step-sub">Storybook にストーリーを登録</p>
+          </div>
+          <div class="flow-step">
+            <p class="flow-step-num">04</p>
+            <p class="flow-step-title">addon-designs</p>
+            <p class="flow-step-sub">Figma を Storybook 内に直接埋め込み</p>
+          </div>
+        </div>
+
+        <div style="margin-top:36px;">
+          <p style="font-size:14px;color:var(--fg-muted);margin-bottom:20px;line-height:1.75;">Webpack と Vite はどちらも「JS をまとめるビルドツール」だが、その思想は大きく異なる。</p>
+          <div class="compare">
+            <div class="compare-col col-a">
+              <p class="compare-col-label">Webpack — 信頼のベテラン</p>
+              <ul class="compare-list">
+                <li>起動前にすべてのファイルを解析・バンドル</li>
+                <li>プロジェクトが大きいほど起動が遅くなる</li>
+                <li>設定の自由度が高い分、複雑になりやすい</li>
+                <li>大規模・レガシー対応に強い</li>
+              </ul>
+            </div>
+            <div class="compare-col col-b">
+              <p class="compare-col-label">Vite — 期待の新星 ✓ 採用</p>
+              <ul class="compare-list">
+                <li>ES Modules を使い「今必要なファイルだけ」を送る</li>
+                <li>起動・HMR が爆速。修正が一瞬で画面に反映</li>
+                <li>設定がシンプルで初期セットアップが楽</li>
+                <li>新規プロジェクトではこちらが標準になりつつある</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="codeblock" style="margin-top:36px;">
+          <p class="codeblock-label">React + Vite セットアップ</p>
+          <pre><span class="cm"># プロジェクト作成</span>
+<span class="kw">npm</span> create vite@latest my-site -- --template react-ts
+<span class="kw">cd</span> my-site && npm install && npm run dev
+
+<span class="cm"># Storybook 初期化</span>
+<span class="kw">npx</span> storybook@latest init
+<span class="kw">npm</span> run storybook
+
+<span class="cm"># Figma 埋め込みアドオン</span>
+<span class="kw">npm</span> i -D @storybook/addon-designs</pre>
+        </div>
+
+        <div class="note">
+          <p class="note-label">詰まったところ</p>
+          <ul class="note-list">
+            <li><code>sh: vite: command not found</code> → フォルダ名の空白が原因。<code>OFFJT 2:7</code> → <code>OFFJT_2-7</code> にリネームで解決</li>
+            <li><code>Could not read package.json</code> → <code>my-site</code> の外から実行していた。<code>cd my-site</code> してから実行</li>
+            <li><code>zsh: parse error near '}'</code> → TypeScript コードをターミナルに直接貼っていた。VSCode でファイルに書く</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="learn-block reveal">
+    <div class="lb-header">
+      <span class="lb-num">04</span>
+      <div>
+        <p class="lb-phase-label">Phase 04 / 2026年3月</p>
+        <h3 class="lb-title">高度な実装と<br>フレームワークの深化</h3>
+        <p class="lb-period">2026.03 — TypeScript · Button Component · Storybook</p>
+      </div>
+    </div>
+    <div class="lb-body">
+      <span></span>
+      <div>
+        <p style="font-size:15px;color:var(--fg-muted);line-height:1.85;max-width:600px;margin-bottom:28px;">TypeScript を導入。デザイナーが Figma で定義した <em style="font-style:normal;color:var(--fg);">variant / size / width / state</em> の仕様を、そのまま props の型として表現できることで「デザインと実装の乖離」を防ぐ設計を体感した。</p>
+
+        <div class="codeblock">
+          <p class="codeblock-label">Button.tsx — 型定義</p>
+          <pre><span class="kw">export type</span> <span class="ty">ButtonAppearance</span> =
+  | <span class="st">"primaryFilled"</span> | <span class="st">"primaryOutlined"</span> | <span class="st">"primaryGhost"</span>
+  | <span class="st">"alertFilled"</span>   | <span class="st">"alertOutlined"</span>   | <span class="st">"alertGhost"</span>
+  | <span class="st">"neutralGhost"</span>;
+
+<span class="kw">export type</span> <span class="ty">ButtonSize</span>        = <span class="st">"small"</span> | <span class="st">"medium"</span> | <span class="st">"large"</span>;
+<span class="kw">export type</span> <span class="ty">ButtonWidth</span>       = <span class="st">"hug"</span> | <span class="st">"fill"</span>;
+
+<span class="cm">/** Storybook 上でホバー/無効化の見た目を固定表示するための state */</span>
+<span class="kw">export type</span> <span class="ty">ButtonVisualState</span> = <span class="st">"default"</span> | <span class="st">"hover"</span> | <span class="st">"disabled"</span>;</pre>
+        </div>
+
+        <div class="learn-items" style="margin-top:36px;">
+          <div class="learn-item">
+            <p class="learn-item-label">ポイント 01</p>
+            <h4 class="learn-item-title">.ts と .tsx の使い分け</h4>
+            <p class="learn-item-text"><code>.ts</code> はロジック・型定義・設定ファイル。<code>.tsx</code> は JSX（HTML ライクな UI 記述）を含む React コンポーネント。</p>
+          </div>
+          <div class="learn-item">
+            <p class="learn-item-label">ポイント 02</p>
+            <h4 class="learn-item-title">visualState による hover の固定</h4>
+            <p class="learn-item-text">マウスイベントではなく <code>data-state="hover"</code> 属性で見た目を CSS から制御。Storybook 上でホバー状態を常に確認できる設計にした。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section id="summary" class="section">
+  <div class="ch reveal">
+    <span class="ch-num">02</span>
+    <h2 class="ch-title">学んだこと・<span>まとめ</span></h2>
+  </div>
+
+  <div class="summary-cols reveal">
+    <div class="s-col">
+      <p class="s-col-label">得られた学び</p>
+      <ul class="s-list">
+        <li>Figma → React → Storybook のワークフローを実践で習得</li>
+        <li>Vite の仕組みと HMR・npm スクリプトの運用を体得</li>
+        <li>Git / GitHub のバージョン管理フローをマスター</li>
+        <li>TypeScript による型安全なコーディングの基礎を習得</li>
+        <li>エラーログから原因を特定するトラブルシューティング力</li>
+      </ul>
+    </div>
+    <div class="s-col">
+      <p class="s-col-label">達成した成果</p>
+      <ul class="s-list">
+        <li>UIカタログ環境（Storybook）の構築</li>
+        <li>hover / disabled など多状態を管理する Button コンポーネント完成</li>
+        <li>GitHub Pages でのサイト公開</li>
+        <li>Figma の仕様を Storybook に直接埋め込む連携フロー確立</li>
+        <li>中級・上級の Codejump サイト制作</li>
+      </ul>
+    </div>
+    <div class="s-col">
+      <p class="s-col-label">次のステップ</p>
+      <ul class="s-list">
+        <li>Vite を使って Codejump のサイトを完成・公開</li>
+        <li>Propstar プラグインで Figma → props の自動連携を検証</li>
+        <li>Select ボックス等のコンポーネントを追加実装</li>
+        <li>Chromatic でビジュアルリグレッションテストを導入</li>
+        <li>完成したコンポーネントライブラリを本番プロジェクトに活用</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div style="width:100%;text-align:center;padding:80px 48px;border-top:1px solid var(--line);">
+  <img src="./rectangle_large_type_2_3c5da51803769f3bfd10574812721371.webp" style="max-width:700px;width:100%;" />
+</div>
+
+<footer>
+  <p>© 2026 Haruya Hayashi &amp; Takahiko Aizawa</p>
+  <p>OFFJT 開発学習 &nbsp;·&nbsp; 2025.11 – 2026.03</p>
+</footer>
+
+<script>
+/* ── Scroll Reveal ── */
+(function () {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>
