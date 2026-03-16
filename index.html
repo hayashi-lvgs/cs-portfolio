@@ -373,6 +373,43 @@
       flex: 1; width: 100%; border: none;
     }
 
+    /* ── GLOSSARY ── */
+    .gl {
+      color: var(--accent);
+      border-bottom: 1px dashed rgba(242,201,76,0.45);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .gl:hover { opacity: 0.65; }
+
+    #gl-popup {
+      display: none;
+      position: fixed;
+      z-index: 9998;
+      width: 272px;
+      background: #141414;
+      border: 1px solid #2e2e2e;
+      padding: 16px 18px 15px;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.75);
+    }
+    #gl-popup.open { display: block; }
+    #gl-popup-title {
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 9px; padding-right: 20px;
+    }
+    #gl-popup-body {
+      font-size: 13px; color: var(--fg-muted); line-height: 1.75;
+    }
+    #gl-popup-close {
+      position: absolute; top: 10px; right: 12px;
+      background: none; border: none; cursor: pointer;
+      font-family: var(--mono); font-size: 11px;
+      color: var(--fg-dim); padding: 2px 4px;
+      transition: color 0.15s;
+    }
+    #gl-popup-close:hover { color: var(--fg); }
+
     /* ── REVEAL ── */
     .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
     .reveal.in { opacity: 1; transform: none; }
@@ -781,6 +818,13 @@
   <p>OFFJT 開発学習 &nbsp;·&nbsp; 2025.11 – 2026.03</p>
 </footer>
 
+<!-- GLOSSARY POPUP -->
+<div id="gl-popup" role="tooltip">
+  <button id="gl-popup-close" onclick="document.getElementById('gl-popup').classList.remove('open')">✕</button>
+  <p id="gl-popup-title"></p>
+  <p id="gl-popup-body"></p>
+</div>
+
 <!-- STORYBOOK MODAL -->
 <div class="site-modal-overlay" id="storybookModal" onclick="closeStorybookModalOnBg(event)">
   <div class="site-modal" style="max-width:1100px;height:auto;max-height:90vh;">
@@ -873,6 +917,113 @@ function closeSiteModalOnBg(e) {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { closeSiteModal(); closePdfModal(); closeStorybookModal(); }
 });
+
+/* ── Glossary ── */
+(function () {
+  const G = {
+    'GitHub Pages':           { t: 'GitHub Pages',              b: 'GitHubのリポジトリを無料でWebサイトとして公開できる機能。HTMLファイルをpushするだけでインターネットに公開できる。' },
+    'ES Modules':             { t: 'ES Modules',                b: 'JavaScriptの標準的なモジュール（ファイル分割）の仕組み。import/exportを使って機能をファイル間で共有できる。' },
+    'addon-designs':          { t: 'addon-designs',             b: 'StorybookにFigmaのデザインを直接埋め込めるアドオン（拡張機能）。実装とデザインを並べて確認できる。' },
+    'ビジュアルリグレッションテスト': { t: 'ビジュアルリグレッションテスト', b: 'UIの見た目が意図せず変わっていないかを自動チェックするテスト手法。コード変更前後のスクリーンショットを比較して差分を検出する。' },
+    'セマンティックタグ':      { t: 'セマンティックタグ',         b: '意味を持つHTMLタグ（例: header, nav, article）。見た目だけでなく「ここは何のための要素か」を伝え、検索エンジンや音声読み上げにも有効。' },
+    'querySelectorAll':       { t: 'querySelectorAll',          b: 'JavaScriptでHTMLの要素を複数まとめて取得するメソッド。取得した全要素に対して一括で処理を適用できる。' },
+    'addEventListener':       { t: 'addEventListener',          b: 'HTML要素に「クリックされたら〇〇する」などのイベントを登録するメソッド。ボタンを押したときの動作などに使う。' },
+    'querySelector':          { t: 'querySelector',             b: 'JavaScriptでHTMLの要素を1つ取得するメソッド。CSSのようなセレクタで要素を探せる。' },
+    'TypeScript':             { t: 'TypeScript',                b: 'JavaScriptに「型」の概念を追加した言語。変数や関数の型を明示することでバグを事前に防ぎやすくなる。' },
+    'Storybook':              { t: 'Storybook',                 b: 'UIコンポーネントを独立して開発・確認できるツール。ボタンやカードなどの部品をカタログのように一覧管理できる。' },
+    'Chromatic':              { t: 'Chromatic',                 b: 'StorybookのUIをクラウドで管理し、コード変更前後の見た目を自動比較するサービス。意図しないデザイン崩れを検知できる。' },
+    'Homebrew':               { t: 'Homebrew',                  b: 'Mac用のパッケージ管理ツール。brew install gitのようなコマンド一つで開発ツールをインストールできる。' },
+    'Webpack':                { t: 'Webpack',                   b: '複数のJavaScriptファイルを1つにまとめる（バンドルする）ツール。大規模・レガシープロジェクトで広く使われる。' },
+    'Flexbox':                { t: 'Flexbox',                   b: 'CSSのレイアウト機能。要素を横並び・縦並びに柔軟に配置でき、中央寄せや均等配置も簡単に実現できる。' },
+    'GitHub':                 { t: 'GitHub',                    b: 'Gitで管理したコードをインターネット上で保存・共有できるサービス。チームでの共同開発にも使われる。' },
+    'Figma':                  { t: 'Figma',                     b: 'ブラウザで動くUIデザインツール。デザイナーがレイアウト・コンポーネントの仕様を作成・共有するために使われる。' },
+    'React':                  { t: 'React',                     b: 'Meta（旧Facebook）が開発したJavaScriptライブラリ。UIを「コンポーネント」という再利用可能な部品に分けて構築できる。' },
+    'reset.css':              { t: 'reset.css',                 b: 'ブラウザごとに異なるデフォルトのスタイルをゼロにリセットするCSSファイル。どのブラウザでも同じ見た目から始めるための出発点。' },
+    'CSSOM':                  { t: 'CSSOM',                     b: 'CSSをブラウザが読み込んで作るデータ構造。DOMと組み合わせてレンダーツリーを生成し、画面表示に使われる。' },
+    'Vite':                   { t: 'Vite',                      b: '高速なフロントエンドのビルドツール。開発中の変更が瞬時に画面に反映され、起動・更新が爆速。Webpackの後継として普及中。' },
+    'HMR':                    { t: 'HMR（ホットリロード）',       b: 'コードを変更すると、ページ全体をリロードせずに変更部分だけを即座に反映する機能。開発の体験・効率が大幅に向上する。' },
+    'CSSOM':                  { t: 'CSSOM',                     b: 'CSSをブラウザが読み込んで作るデータ構造。DOMと組み合わせてレンダーツリーを生成し、画面表示に使われる。' },
+    'DOM':                    { t: 'DOM',                       b: 'HTMLをブラウザが読み込んで作るツリー状のデータ構造。JavaScriptから「この要素の色を変えて」などと操作できる。' },
+    'Git':                    { t: 'Git',                       b: 'ファイルの変更履歴を管理するバージョン管理ツール。「いつ・誰が・何を変えたか」を記録でき、過去の状態に戻すことも可能。' },
+    'npm':                    { t: 'npm',                       b: 'JavaScriptのパッケージ管理ツール。npm install reactのようにライブラリや開発ツールをコマンド一つでインストール・管理できる。' },
+    'DNS':                    { t: 'DNS',                       b: 'ドメイン名（例: google.com）をIPアドレスに変換する「インターネットの住所録」。URLを入力すると最初にDNSへ問い合わせが行われる。' },
+    'HTTP':                   { t: 'HTTP',                      b: 'ブラウザとサーバーがデータをやり取りするための通信規約。「このページを見せて（リクエスト）」「はい、どうぞ（レスポンス）」のような会話ルール。' },
+    'TCP':                    { t: 'TCP接続',                   b: 'インターネットでデータを確実に届けるための通信プロトコル（規約）。送受信の確認をしながら通信するため、データの欠損が起きにくい。' },
+    'JSX':                    { t: 'JSX',                       b: 'JavaScript内にHTMLのような記法でUIを書けるReactの構文。実際にはJavaScriptに変換されて動作する。' },
+    'レンダリング':             { t: 'レンダリング',               b: 'ブラウザがHTMLやCSSを解析して画面に表示する処理。DOMとCSSOMを生成し、レイアウト計算→ペイントの順で実行される。' },
+    'リフロー':                { t: 'リフロー',                   b: 'JavaScriptでDOMを変更したとき、要素のサイズや位置を再計算する処理。頻繁に起きるとページの描画が重くなる。' },
+    'props':                  { t: 'props',                     b: 'Reactコンポーネントに渡すパラメータ（引数）。コンポーネントの見た目や動作をカスタマイズするために使う。例: size="large" など。' },
+    'commit':                 { t: 'commit（コミット）',          b: 'Gitでファイルの変更を「記録・保存」する操作。スナップショットのようなもので、後から特定の時点に戻せる。' },
+    'push':                   { t: 'push（プッシュ）',            b: '手元のPC（ローカル）のGit変更をGitHub等のリモートサーバーに送信する操作。' },
+  };
+
+  const terms = Object.keys(G).sort((a, b) => b.length - a.length);
+  const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('(' + terms.map(esc).join('|') + ')');
+  const SKIP = new Set(['CODE','PRE','SCRIPT','STYLE','A','BUTTON','H1','H2','H3','H4']);
+
+  function walk(root) {
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(n) {
+        let p = n.parentElement;
+        while (p) {
+          if (SKIP.has(p.tagName) || p.classList.contains('gl') || p.id === 'gl-popup') return NodeFilter.FILTER_REJECT;
+          p = p.parentElement;
+        }
+        return re.test(n.textContent) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    const nodes = [];
+    while (tw.nextNode()) nodes.push(tw.currentNode);
+    nodes.forEach(node => {
+      const parts = node.textContent.split(re);
+      if (parts.length <= 1) return;
+      const frag = document.createDocumentFragment();
+      parts.forEach(p => {
+        if (G[p]) {
+          const s = document.createElement('span');
+          s.className = 'gl'; s.dataset.gl = p; s.textContent = p;
+          frag.appendChild(s);
+        } else {
+          frag.appendChild(document.createTextNode(p));
+        }
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+  walk(document.body);
+
+  const pop = document.getElementById('gl-popup');
+  const pt  = document.getElementById('gl-popup-title');
+  const pb  = document.getElementById('gl-popup-body');
+
+  document.addEventListener('click', function (e) {
+    const gl = e.target.closest && e.target.closest('.gl');
+    if (gl) {
+      e.stopPropagation();
+      const info = G[gl.dataset.gl];
+      if (!info) return;
+      pt.textContent = info.t;
+      pb.textContent = info.b;
+      pop.classList.add('open');
+      const r  = gl.getBoundingClientRect();
+      const pw = 272;
+      const ph = pop.offsetHeight || 110;
+      let top  = r.bottom + 8;
+      let left = r.left;
+      if (left + pw > window.innerWidth - 12) left = window.innerWidth - pw - 12;
+      if (left < 12) left = 12;
+      if (r.bottom + ph + 8 > window.innerHeight) top = r.top - ph - 8;
+      pop.style.top  = top  + 'px';
+      pop.style.left = left + 'px';
+    } else if (!e.target.closest('#gl-popup')) {
+      pop.classList.remove('open');
+    }
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') pop.classList.remove('open');
+  });
+})();
 
 /* ── Scroll Reveal ── */
 (function () {
